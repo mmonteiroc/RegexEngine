@@ -78,6 +78,7 @@ class Pieza{
             }
 
         }
+
         devolver.add(car(temp.toString().toCharArray()));
         return devolver.toArray(new Pieza[0]);
     }
