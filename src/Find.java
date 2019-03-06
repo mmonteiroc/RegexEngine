@@ -8,9 +8,9 @@
 * $ --> FINAL
 * + --> 1 to ∞
 * * --> 0 to ∞
-*
 * */
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,14 +25,54 @@ public class Find {
     }
 
     public boolean match(String regex) {
-        this.regexOriginal =regex;
-        piezas = Pieza.getPieza(regex);
+        Pieza[] piezas = Pieza.getPieza(regex);
+        if (piezas==null){
+            return false;
+        }
 
-        for (int i = 0; i < piezas.length; i++) {
+        boolean InterroganteUsado = false;
+        boolean PrincipioUsado = false;
 
-            if (texto.contains(piezas[i].getCar())){
+        int x = 0;
+        for (int i = 0; i < this.texto.length(); i++) {
+
+
+            if (x==piezas.length) {
                 return true;
+            }else if (piezas[0+x].getType()== Pieza.Type.cualquierCaracter){
+                InterroganteUsado=true;
+                if (i==this.texto.length()){
+                    if (PrincipioUsado){
+                        return false;
+                    }
+                    x=0;
+                }else {
+                    x++;
+                }
+
+            }else if (piezas[i].getType()==Pieza.Type.inicioFrase){
+                PrincipioUsado = true;
+                x++;
+                i--;
+
+            }else if(this.texto.charAt(i)==piezas[0+x].getCaracter()){
+                x++;
+            }else{
+                x=0;
+                if (PrincipioUsado){
+                    return false;
+                }
+                if (InterroganteUsado){
+                    i--;
+                    InterroganteUsado=false;
+                }
+
             }
+
+
+        }
+        if (x==piezas.length) {
+            return true;
         }
 
 
@@ -41,57 +81,101 @@ public class Find {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
 class Pieza{
 
-    private enum Type{
+    enum Type{
 
-        cuantificador, caracterLiteral
+        cuantificador, caracterLiteral, cualquierCaracter, inicioFrase, finalFrase
 
     }
-    private String car;
+    private char caracter;
     private Type type;
 
     private Pieza(){}
 
-    private static Pieza car(char[] c){
+    private static Pieza caracter(char c){
         Pieza p = new Pieza();
-        String t="";
-        for (int i = 0; i < c.length; i++) {
-            t+=c[i];
-        }
-        p.car = t;
+        p.caracter = c;
         p.type = Type.caracterLiteral;
         return p;
     }
 
+    private static  Pieza cualquierCaracter(){
+        Pieza p = new Pieza();
+        p.type = Type.cualquierCaracter;
+        return p;
+    }
+
+    private static Pieza posicion(char c){
+        Pieza p = new Pieza();
+
+        if (c=='%'){
+            p.type=Type.inicioFrase;
+        }else {
+            p.type=Type.finalFrase;
+        }
+        p.caracter=c;
+        return p;
+    }
+
+
+
     static public Pieza[] getPieza(String expresion){
         List<Pieza> devolver = new ArrayList<>();
         StringBuilder temp= new StringBuilder();
+
+        if (expresion==""){
+            return null;
+        }
         for (int i = 0; i < expresion.length(); i++) {
-            if ((expresion.charAt(i)>=65 && expresion.charAt(i)<=90) | (expresion.charAt(i)>=97 && expresion.charAt(i)<=122) ){
-                // Letra
-                temp.append(expresion.charAt(i));
+            if ((expresion.charAt(i) >= 65 && expresion.charAt(i) <= 90) | (expresion.charAt(i) >= 97 && expresion.charAt(i) <= 122)) {
 
+                devolver.add(caracter(expresion.charAt(i)));
+            } else if (expresion.charAt(i)=='@'){
+                i++;
+                devolver.add(caracter(expresion.charAt(i)));
 
-            }else {
-                devolver.add(car(temp.toString().toCharArray()));
+            }else if(expresion.charAt(i)=='?'){
+
+                devolver.add(cualquierCaracter());
+
+            }else if((expresion.charAt(i)=='%' && i==0) | (expresion.charAt(i)=='$' && i==expresion.length()-1)){
+
+                devolver.add(posicion(expresion.charAt(i)));
+
+            }else{
+                devolver.add(caracter(expresion.charAt(i)));
             }
 
         }
+        System.out.println(Arrays.toString(devolver.toArray(new Pieza[0])));
 
-        devolver.add(car(temp.toString().toCharArray()));
         return devolver.toArray(new Pieza[0]);
     }
 
 
 
-    public String getCar(){
-        return this.car;
+    public char getCaracter(){
+        return this.caracter;
+    }
+    public Type getType() {
+        return this.type;
     }
 
     @Override
     public String toString(){
-        return car.toString();
+        return Character.toString(caracter);
     }
 
 }
