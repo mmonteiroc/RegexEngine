@@ -32,6 +32,8 @@ public class Find {
 
         boolean InterroganteUsado = false;
         boolean PrincipioUsado = false;
+        boolean FinUsado = false;
+
 
         int x = 0;
         for (int i = 0; i < this.texto.length(); i++) {
@@ -50,7 +52,16 @@ public class Find {
                     x++;
                 }
 
-            }else if (piezas[i].getType()==Pieza.Type.inicioFrase){
+            }else if (piezas[0+x].getType()==Pieza.Type.finalFrase){
+                FinUsado = true;
+                x++;
+                if (x==texto.length()){
+                    return true;
+                }else {
+                    return false;
+                }
+
+            }else if(piezas[0+x].getType()==Pieza.Type.inicioFrase){
                 PrincipioUsado = true;
                 x++;
                 i--;
@@ -71,10 +82,14 @@ public class Find {
 
 
         }
+
         if (x==piezas.length) {
             return true;
         }
 
+        if (piezas[x].getType()==Pieza.Type.finalFrase){
+            return true;
+        }
 
         return false;
     }
@@ -96,11 +111,12 @@ class Pieza{
 
     enum Type{
 
-        cuantificador, caracterLiteral, cualquierCaracter, inicioFrase, finalFrase
+        cuantificador, caracterLiteral, cualquierCaracter, inicioFrase, finalFrase, multiplesCaracteres
 
     }
     private char caracter;
     private Type type;
+    private String caracteres;
 
     private Pieza(){}
 
@@ -129,6 +145,13 @@ class Pieza{
         return p;
     }
 
+    private static Pieza caracteres(String s){
+        Pieza p = new Pieza();
+        p.type=Type.multiplesCaracteres;
+        p.caracteres=s;
+        return p;
+    }
+
 
 
     static public Pieza[] getPieza(String expresion){
@@ -154,11 +177,30 @@ class Pieza{
 
                 devolver.add(posicion(expresion.charAt(i)));
 
+            }else if(expresion.charAt(i) == '['){
+                StringBuilder temporal = new StringBuilder();
+                i++;
+                for (int j = i; j < expresion.length(); j++) {
+                    if (expresion.charAt(j)==']'){
+                        i++;
+                        break;
+                    }else{
+                        if (expresion.charAt(j)=='-'){
+
+                        }else {
+                            temporal.append(expresion.charAt(j));
+                        }
+                    }
+                }
+
+                devolver.add(caracteres(temporal.toString()));
+
             }else{
                 devolver.add(caracter(expresion.charAt(i)));
             }
 
         }
+
         System.out.println(Arrays.toString(devolver.toArray(new Pieza[0])));
 
         return devolver.toArray(new Pieza[0]);
@@ -175,7 +217,7 @@ class Pieza{
 
     @Override
     public String toString(){
-        return Character.toString(caracter);
+        return Character.toString(caracter) + " " + caracteres;
     }
 
 }
