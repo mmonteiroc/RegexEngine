@@ -209,15 +209,12 @@ class Pieza{
 
                                 temporal.append('-');
                             }else {
-                                int carAnterior = caracterAnterior;
-                                int carPosterior = caracterPosterior;
 
                                 char temp1 ;
-                                for (int k = carAnterior+1; k < carPosterior; k++) {
+                                for (int k = caracterAnterior+1; k < caracterPosterior; k++) {
                                     temp1 =(char) k;
 
                                     temporal.append(temp1);
-                                    System.out.println(temp1);
                                 }
                             }
 
@@ -227,7 +224,6 @@ class Pieza{
                     }
                 }
 
-                System.out.println(temporal.toString());
                 devolver.add(caracteres(temporal.toString()));
 
             }else{
