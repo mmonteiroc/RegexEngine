@@ -198,6 +198,29 @@ class Pieza{
                     }else{
                         if (expresion.charAt(j)=='-'){
 
+
+
+
+                            char caracterAnterior = expresion.charAt(j-1);
+                            char caracterPosterior = expresion.charAt(j+1);
+
+                            if (caracterAnterior=='@'){
+                                temporal.deleteCharAt(temporal.length()-1);
+
+                                temporal.append('-');
+                            }else {
+                                int carAnterior = caracterAnterior;
+                                int carPosterior = caracterPosterior;
+
+                                char temp1 ;
+                                for (int k = carAnterior+1; k < carPosterior; k++) {
+                                    temp1 =(char) k;
+
+                                    temporal.append(temp1);
+                                    System.out.println(temp1);
+                                }
+                            }
+
                         }else {
                             temporal.append(expresion.charAt(j));
                         }

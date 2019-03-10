@@ -119,6 +119,8 @@ public class FindTest {
         assertEquals(false, f.match("ca[A-Z]"));
         assertEquals(true, f.match("ca[A-Zn]"));
         assertEquals(true, f.match("ca[A-Za-z]"));
+        f = new Find("Hola tete-");
+        assertEquals(true,f.match("tete[@-A-Z0-9a-z?_]"));
     }
 
     @Test
