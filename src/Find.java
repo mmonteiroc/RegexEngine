@@ -66,6 +66,17 @@ public class Find {
                 x++;
                 i--;
 
+            }else if(piezas[0+x].getType()==Pieza.Type.multiplesCaracteres){
+                // []
+
+                if (piezas[0+x].getCaracteres().contains(Character.toString(this.texto.charAt(i)))){
+                    x++;
+                }else {
+                    x=0;
+                }
+
+
+
             }else if(this.texto.charAt(i)==piezas[0+x].getCaracter()){
                 x++;
             }else{
@@ -182,7 +193,7 @@ class Pieza{
                 i++;
                 for (int j = i; j < expresion.length(); j++) {
                     if (expresion.charAt(j)==']'){
-                        i++;
+                        i+=(j-i);
                         break;
                     }else{
                         if (expresion.charAt(j)=='-'){
@@ -193,6 +204,7 @@ class Pieza{
                     }
                 }
 
+                System.out.println(temporal.toString());
                 devolver.add(caracteres(temporal.toString()));
 
             }else{
@@ -207,7 +219,9 @@ class Pieza{
     }
 
 
-
+    public String getCaracteres() {
+        return caracteres;
+    }
     public char getCaracter(){
         return this.caracter;
     }
