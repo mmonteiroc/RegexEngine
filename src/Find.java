@@ -17,31 +17,38 @@ import java.util.List;
 
 public class Find {
     private String texto;
-    private String regexOriginal;
-    private Pieza[] piezas;
+    private  Pieza[] piezas;
+
 
     public Find(String texto) {
         this.texto=texto;
     }
 
     public boolean match(String regex) {
+
+
+
         Pieza[] piezas = Pieza.getPieza(regex);
-        if (piezas==null){
+        if (piezas == null) {
             return false;
         }
+
 
         boolean InterroganteUsado = false;
         boolean PrincipioUsado = false;
         boolean FinUsado = false;
 
-
         int x = 0;
         for (int i = 0; i < this.texto.length(); i++) {
 
 
+
+
+
             if (x==piezas.length) {
                 return true;
-            }else if (piezas[0+x].getType()== Pieza.Type.cualquierCaracter){
+            }else if (piezas[x].getType()== Pieza.Type.cualquierCaracter){
+
                 InterroganteUsado=true;
                 if (i==this.texto.length()){
                     if (PrincipioUsado){
@@ -52,7 +59,7 @@ public class Find {
                     x++;
                 }
 
-            }else if (piezas[0+x].getType()==Pieza.Type.finalFrase){
+            }else if (piezas[x].getType()==Pieza.Type.finalFrase){
                 FinUsado = true;
                 x++;
                 if (x==texto.length()){
@@ -61,24 +68,43 @@ public class Find {
                     return false;
                 }
 
-            }else if(piezas[0+x].getType()==Pieza.Type.inicioFrase){
+            }else if(piezas[x].getType()==Pieza.Type.inicioFrase){
                 PrincipioUsado = true;
                 x++;
                 i--;
 
-            }else if(piezas[0+x].getType()==Pieza.Type.multiplesCaracteres){
+            }else if(piezas[x].getType()==Pieza.Type.multiplesCaracteres){
                 // []
 
-                if (piezas[0+x].getCaracteres().contains(Character.toString(this.texto.charAt(i)))){
+                if (piezas[x].getCaracteres().contains(Character.toString(this.texto.charAt(i)))){
                     x++;
                 }else {
                     x=0;
                 }
 
+            }else if(piezas[x].getType()==Pieza.Type.cuantificador){
+
+                int cont=0;
+                Pieza piezaCuantificada = piezas[x].getPiezaCuantificada();
 
 
-            }else if(this.texto.charAt(i)==piezas[0+x].getCaracter()){
+                while (true){
+
+
+
+
+
+
+
+                  break;
+                }
+
                 x++;
+
+            }else if(this.texto.charAt(i)==piezas[x].getCaracter()){
+                x++;
+
+
             }else{
                 x=0;
                 if (PrincipioUsado){
@@ -98,13 +124,35 @@ public class Find {
             return true;
         }
 
-        if (piezas[x].getType()==Pieza.Type.finalFrase){
-            return true;
-        }
+        return piezas[x].getType() == Pieza.Type.finalFrase;
 
-        return false;
     }
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -128,6 +176,11 @@ class Pieza{
     private char caracter;
     private Type type;
     private String caracteres;
+    private Pieza piezaCuantificada;
+
+
+    //Atributo de cuantificador
+    private boolean minimo;
 
     private Pieza(){}
 
@@ -163,6 +216,19 @@ class Pieza{
         return p;
     }
 
+    private static Pieza cuantificador(char c, Pieza pp){
+        Pieza p = new Pieza();
+        p.piezaCuantificada = pp;
+
+        p.type=Type.cuantificador;
+        p.caracter=c;
+
+        if (c=='+'){
+            p.minimo=true;
+        }
+        return p;
+    }
+
 
 
     static public Pieza[] getPieza(String expresion){
@@ -174,19 +240,20 @@ class Pieza{
         }
         for (int i = 0; i < expresion.length(); i++) {
             if ((expresion.charAt(i) >= 65 && expresion.charAt(i) <= 90) | (expresion.charAt(i) >= 97 && expresion.charAt(i) <= 122)) {
-
                 devolver.add(caracter(expresion.charAt(i)));
             } else if (expresion.charAt(i)=='@'){
                 i++;
                 devolver.add(caracter(expresion.charAt(i)));
-
             }else if(expresion.charAt(i)=='?'){
-
                 devolver.add(cualquierCaracter());
-
             }else if((expresion.charAt(i)=='%' && i==0) | (expresion.charAt(i)=='$' && i==expresion.length()-1)){
-
                 devolver.add(posicion(expresion.charAt(i)));
+            }else if (expresion.charAt(i)=='+'){
+
+                Pieza pp = devolver.get(devolver.size()-1);
+                devolver.remove(devolver.size()-1);
+                devolver.add(cuantificador(expresion.charAt(i),pp));
+
 
             }else if(expresion.charAt(i) == '['){
                 StringBuilder temporal = new StringBuilder();
@@ -197,9 +264,6 @@ class Pieza{
                         break;
                     }else{
                         if (expresion.charAt(j)=='-'){
-
-
-
 
                             char caracterAnterior = expresion.charAt(j-1);
                             char caracterPosterior = expresion.charAt(j+1);
@@ -213,11 +277,9 @@ class Pieza{
                                 char temp1 ;
                                 for (int k = caracterAnterior+1; k < caracterPosterior; k++) {
                                     temp1 =(char) k;
-
                                     temporal.append(temp1);
                                 }
                             }
-
                         }else {
                             temporal.append(expresion.charAt(j));
                         }
@@ -247,10 +309,16 @@ class Pieza{
     public Type getType() {
         return this.type;
     }
+    public boolean isMinimo() {
+        return minimo;
+    }
+    public Pieza getPiezaCuantificada() {
+        return piezaCuantificada;
+    }
 
     @Override
     public String toString(){
-        return Character.toString(caracter) + " " + caracteres;
+        return Character.toString(caracter) + " " + caracteres+" "+piezaCuantificada;
     }
 
 }
