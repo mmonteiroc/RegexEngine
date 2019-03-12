@@ -1,16 +1,3 @@
-/*
-* CARACTERES ESPECIALES
-* lo que usamos --> originales de regexOriginal
-* ? --> .
-* @ --> \
-* []
-* % --> INICIO
-* $ --> FINAL
-* + --> 1 to ∞
-* * --> 0 to ∞
-* */
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +26,6 @@ public class Find {
         boolean FinUsado = false;
 
         int x = 0;
-        System.out.println(this.texto.length());
         for (int i = 0; i < this.texto.length(); i++) {
 
 
@@ -316,16 +302,12 @@ class Pieza{
                         }
                     }
                 }
-
                 devolver.add(caracteres(temporal.toString()));
-
             }else{
                 devolver.add(caracter(expresion.charAt(i)));
             }
 
         }
-
-        System.out.println(Arrays.toString(devolver.toArray(new Pieza[0])));
 
         return devolver.toArray(new Pieza[0]);
     }

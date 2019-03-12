@@ -167,6 +167,11 @@ public class FindTest {
         assertEquals(false, f.match("14*2"));
         assertEquals(true, f.match("14*9"));
         assertEquals(false, f.match("14*9$"));
+
+        f = new Find("ES liceu");
+        assertEquals(true, f.match("E+S+ +liceu+"));
+
+
     }
 
 }
