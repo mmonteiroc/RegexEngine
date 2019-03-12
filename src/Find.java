@@ -39,6 +39,7 @@ public class Find {
         boolean FinUsado = false;
 
         int x = 0;
+        System.out.println(this.texto.length());
         for (int i = 0; i < this.texto.length(); i++) {
 
 
@@ -90,7 +91,12 @@ public class Find {
 
                 while (true){
 
-                    if (i==this.texto.length())break;
+
+                    if (piezas[x].getCaracter()=='+'){
+                        if (i==this.texto.length())break;
+                    }else if (piezas[x].getCaracter()=='*'){
+                        if (i==this.texto.length()-1)break;
+                    }
                     if (piezaCuantificada.getType()==Pieza.Type.multiplesCaracteres){
                         if (piezaCuantificada.getCaracteres().contains(Character.toString(this.texto.charAt(i)))){
                             i++;
@@ -115,6 +121,11 @@ public class Find {
 
                 if (piezas[x].getCaracter()=='+'){
                     if (cont>0){
+                        x++;
+                        i--;
+                    }
+                }else if (piezas[x].getCaracter()=='*'){
+                    if (cont>=0){
                         x++;
                         i--;
                     }
@@ -268,7 +279,7 @@ class Pieza{
                 devolver.add(cualquierCaracter());
             }else if((expresion.charAt(i)=='%' && i==0) | (expresion.charAt(i)=='$' && i==expresion.length()-1)){
                 devolver.add(posicion(expresion.charAt(i)));
-            }else if (expresion.charAt(i)=='+'){
+            }else if (expresion.charAt(i)=='+'|expresion.charAt(i)=='*'){
 
                 Pieza pp = devolver.get(devolver.size()-1);
                 devolver.remove(devolver.size()-1);

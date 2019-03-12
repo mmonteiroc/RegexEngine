@@ -157,7 +157,7 @@ public class FindTest {
         assertEquals(false, f.match("abbb*c"));
         assertEquals(true, f.match("az*bc"));
 
-        f = new Find("192228888888888888886722222226");
+         f = new Find("192228888888888888886722222226");
         assertEquals(true, f.match("192*8*672*6"));
         assertEquals(false, f.match("2*78*6"));
         assertEquals(true, f.match("1*"));
