@@ -90,16 +90,36 @@ public class Find {
 
                 while (true){
 
+                    if (i==this.texto.length())break;
+                    if (piezaCuantificada.getType()==Pieza.Type.multiplesCaracteres){
+                        if (piezaCuantificada.getCaracteres().contains(Character.toString(this.texto.charAt(i)))){
+                            i++;
+                        }else {
+                            break;
+                        }
+                    }else if (piezaCuantificada.getType()==Pieza.Type.cualquierCaracter){
+                        break;
+                    }else if (piezaCuantificada.getType()==Pieza.Type.caracterLiteral){
+
+                        if(this.texto.charAt(i)==piezaCuantificada.getCaracter()){
+                            i++;
+                        }else {
+                            break;
+                        }
+
+                    }
 
 
-
-
-
-
-                  break;
+                    cont++;
                 }
 
-                x++;
+                if (piezas[x].getCaracter()=='+'){
+                    if (cont>0){
+                        x++;
+                        i--;
+                    }
+                }
+
 
             }else if(this.texto.charAt(i)==piezas[x].getCaracter()){
                 x++;
