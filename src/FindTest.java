@@ -140,7 +140,10 @@ public class FindTest {
         assertEquals(true, f.match("%[abc]+$"));
         assertEquals(false, f.match("%[ab]+$"));
         assertEquals(false, f.match("az+bc"));
+
+        assertEquals(true, f.match("a+bc"));
     }
+
 
     @Test
     public void closures2() {
@@ -167,10 +170,11 @@ public class FindTest {
         assertEquals(false, f.match("14*2"));
         assertEquals(true, f.match("14*9"));
         assertEquals(false, f.match("14*9$"));
-
         f = new Find("ES liceu");
         assertEquals(true, f.match("E+S+ +liceu+"));
-
+        assertEquals(false,f.match("eS l?*U"));
+        f = new Find("abbbcbbbcd");
+        assertEquals(true, f.match("a[bc]*d"));
 
     }
 

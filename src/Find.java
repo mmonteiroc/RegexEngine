@@ -1,35 +1,56 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Find {
     private String texto;
-    private  Pieza[] piezas;
-
 
     public Find(String texto) {
         this.texto=texto;
     }
 
+
+    /**
+     * @param regex Expreison regular en forma de string
+     * @return   True or False dependiendo si ha dado match o no
+     *
+     *     En este método lo que hacemos es recibir una string la
+     *     cual llamaremos a Piezas para que nos retorne el array
+     *     con todas la piezas de dicha String.
+     *
+     *     Entonces lo que haremos será ir recorriendo el texto y
+     *     ir comparándolo con la primera pieza, hasta que nos de
+     *     algún match, entonces seguiremos igual pero con la segunda
+     *     pieza y así iremos sucesivamente.
+     *
+     *     Dependiendo de qué pieza toque haremos una de las siguientes
+     *         cosas, si es un carácter literal, simplemente miraremos
+     *     q ese carácter de esa pieza sea el mismo al que el del texto
+     *     de dicha posición, si es una pieza de Cualquier Carácter lo
+     *     que haremos es dar match con cualquier carácter del texto.
+     *     Si es una pieza de inicio de frase lo que hacemos es que
+     *     continuamos normal pero a la primera que la que falle ya
+     *     no dará match y no reiniciamos.
+     *     Si es de final de texto, lo que hacemos es que al acabar
+     *     el array de piezas, también tendremos que haber acabado el texto.
+     *     Si es de múltiples caracteres hacemos lo mismo que con
+     *     carácter literal, pero que el char del texto puede coincidir
+     *     con más de uno de la pieza.
+     *     Y si es cuantificador hacemos lo mismo que antes pero esa misma
+     *     pieza se puede repetir hasta que deje de hacer match
+     *     y después cambiamos de pieza
+     */
     public boolean match(String regex) {
-
-
 
         Pieza[] piezas = Pieza.getPieza(regex);
         if (piezas == null) {
             return false;
         }
 
-
         boolean InterroganteUsado = false;
         boolean PrincipioUsado = false;
         boolean FinUsado = false;
-
         int x = 0;
         for (int i = 0; i < this.texto.length(); i++) {
-
-
-
 
 
             if (x==piezas.length) {
@@ -37,23 +58,11 @@ public class Find {
             }else if (piezas[x].getType()== Pieza.Type.cualquierCaracter){
 
                 InterroganteUsado=true;
-                if (i==this.texto.length()){
-                    if (PrincipioUsado){
-                        return false;
-                    }
-                    x=0;
-                }else {
-                    x++;
-                }
+                x++;
 
             }else if (piezas[x].getType()==Pieza.Type.finalFrase){
-                FinUsado = true;
                 x++;
-                if (x==texto.length()){
-                    return true;
-                }else {
-                    return false;
-                }
+                return x == texto.length();
 
             }else if(piezas[x].getType()==Pieza.Type.inicioFrase){
                 PrincipioUsado = true;
@@ -74,10 +83,7 @@ public class Find {
                 int cont=0;
                 Pieza piezaCuantificada = piezas[x].getPiezaCuantificada();
 
-
                 while (true){
-
-
                     if (piezas[x].getCaracter()=='+'){
                         if (i==this.texto.length())break;
                     }else if (piezas[x].getCaracter()=='*'){
@@ -98,10 +104,7 @@ public class Find {
                         }else {
                             break;
                         }
-
                     }
-
-
                     cont++;
                 }
 
@@ -116,91 +119,48 @@ public class Find {
                         i--;
                     }
                 }
-
-
             }else if(this.texto.charAt(i)==piezas[x].getCaracter()){
                 x++;
-
-
             }else{
                 x=0;
                 if (PrincipioUsado){
                     return false;
                 }
-                if (InterroganteUsado){
+                if (InterroganteUsado) {
                     i--;
-                    InterroganteUsado=false;
+                    InterroganteUsado = false;
                 }
-
             }
-
-
         }
 
         if (x==piezas.length) {
             return true;
         }
-
         return piezas[x].getType() == Pieza.Type.finalFrase;
-
     }
-
-
-
-
-
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * En esta clase, lo que hacemos es tener el constructor privado para que
+ * no se pueda instanciar una pieza desde fuera de la clase, entonces lo
+ * que hacemos es con un método alternativo, recibir una string la cual
+ * sera la expresion regular que hemos de cambiar a un array de piezas.
+ */
 class Pieza{
 
     enum Type{
-
         cuantificador, caracterLiteral, cualquierCaracter, inicioFrase, finalFrase, multiplesCaracteres
-
     }
     private char caracter;
     private Type type;
     private String caracteres;
     private Pieza piezaCuantificada;
 
-
     //Atributo de cuantificador
     private boolean minimo;
 
     private Pieza(){}
-
     private static Pieza caracter(char c){
         Pieza p = new Pieza();
         p.caracter = c;
@@ -247,7 +207,23 @@ class Pieza{
     }
 
 
-
+    /**
+     * @param expresion Expresion regular en forma de string
+     * @return  expresion regular en forma de aray
+     *
+     *     Vamos recorriendo dicha string, si nos encontramos una
+     *     letra normal lo que hacemos es simplemente añadir una
+     *     pieza de tipo carácter Literal, si nos encontramos una
+     *     @, la ignoramos y añadimos el siguiente carácter como
+     *     tipo carácter Literal, si nos encontramos un interrogante,
+     *     lo que hacemos es añadir una pieza de tipo cualquier Carácter,
+     *     si lo que encontramos es un % o un $ en la primera o última
+     *     posición respectivamente, añadimos una pieza de tipo Principio/final
+     *     de frase, si no están en esas posiciones se toman como carácter literal,
+     *     si nos encontramos un [] lo que hacemos es crear una pieza de tipo
+     *     múltiplesCaracteres guardando todos los caracteres de dentro, y si
+     *     encontramos un + o un * añadimos una pieza de tipo cuantificador
+     */
     static public Pieza[] getPieza(String expresion){
         List<Pieza> devolver = new ArrayList<>();
         StringBuilder temp= new StringBuilder();
@@ -335,3 +311,4 @@ class Pieza{
     }
 
 }
+
